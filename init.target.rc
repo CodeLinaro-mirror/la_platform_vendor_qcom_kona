@@ -61,6 +61,8 @@ on post-fs
     # set RLIMIT_MEMLOCK to 64MB
     setrlimit 8 67108864 67108864
     write /dev/ipa 1
+    # Enable WLAN cold boot calibration
+    write /sys/devices/platform/soc/b0000000.qcom,cnss-qca6390/fs_ready 1
 
 on late-fs
     wait_for_prop hwservicemanager.ready true
@@ -93,6 +95,12 @@ on boot
     setprop vendor.usb.controller a600000.dwc3
     setprop sys.usb.configfs 1
 
+on property:vendor.display.lcd_density=560
+   setprop dalvik.vm.heapgrowthlimit 256m
+
+on property:vendor.display.lcd_density=640
+   setprop dalvik.vm.heapgrowthlimit 512m
+
 #Load WLAN driver
     insmod /vendor/lib/modules/qca_cld3_wlan.ko
 
@@ -104,28 +112,13 @@ on property:vendor.usb.controller=*
 
 on charger
     start vendor.power_off_alarm
-    setprop vendor.usb.controller a600000.dwc3
+    setprop sys.usb.controller a600000.dwc3
     setprop sys.usb.configfs 1
 
 service vendor.qseecomd /vendor/bin/qseecomd
     class core
     user root
     group root
-
-service vendor.adsprpcd /vendor/bin/adsprpcd
-   class main
-   user system
-   group media
-
-service vendor.adsprpcd_audiopd /vendor/bin/adsprpcd audiopd
-   class main
-   user media
-   group media
-
-service vendor.cdsprpcd /vendor/bin/cdsprpcd
-   class main
-   user system
-   group system
 
 service vendor.lowi /vendor/bin/sscrpcd
    class core
