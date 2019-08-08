@@ -37,7 +37,7 @@ BOARD_AVB_ENABLE := true
 #####Dynamic partition Handling
 ###
 #### Turning this flag to TRUE will enable dynamic partition/super image creation.
-BOARD_DYNAMIC_PARTITION_ENABLE ?= true
+BOARD_DYNAMIC_PARTITION_ENABLE ?=false
 
 ifneq ($(strip $(BOARD_DYNAMIC_PARTITION_ENABLE)),true)
 # Enable chain partition for system, to facilitate system-only OTA in Treble.
@@ -284,11 +284,6 @@ BOARD_SYSTEMSDK_VERSIONS := 28
 BOARD_VNDK_VERSION := current
 TARGET_MOUNT_POINTS_SYMLINKS := false
 
-KMGK_USE_QTI_SERVICE := true
-
-#Enable KEYMASTER 4.0
-ENABLE_KM_4_0 := true
-
 # Sensor conf files
 PRODUCT_COPY_FILES += \
     device/qcom/kona/sensors/hals.conf:$(TARGET_COPY_OUT_VENDOR)/etc/sensors/hals.conf \
@@ -304,6 +299,10 @@ PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.hardware.sensor.relative_humidity.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.sensor.relative_humidity.xml \
     frameworks/native/data/etc/android.hardware.sensor.hifi_sensors.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.sensor.hifi_sensors.xml
 
+# FaceAuth feature
+PRODUCT_COPY_FILES += \
+    frameworks/native/data/etc/android.hardware.biometrics.face.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.biometrics.face.xml \
+
 # Fingerprint feature
 PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.hardware.fingerprint.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.fingerprint.xml \
@@ -311,7 +310,9 @@ PRODUCT_COPY_FILES += \
 # system prop for enabling QFS (QTI Fingerprint Solution)
 PRODUCT_PROPERTY_OVERRIDES += \
     persist.vendor.qfp=true
-
+#target specific runtime prop for qspm
+PRODUCT_PROPERTY_OVERRIDES += \
+    ro.vendor.qspm.enable=true
 #ANT+ stack
 PRODUCT_PACKAGES += \
     libvolumelistener
