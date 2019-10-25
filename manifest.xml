@@ -205,6 +205,15 @@ IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
            <instance>default</instance>
        </interface>
     </hal>
+    <hal format="hidl">
+       <name>android.hardware.authsecret</name>
+       <transport>hwbinder</transport>
+       <version>1.0</version>
+       <interface>
+           <name>IAuthSecret</name>
+           <instance>default</instance>
+       </interface>
+    </hal>
     <!-- NFC HAL service -->
     <hal format="hidl">
         <name>android.hardware.nfc</name>
@@ -914,6 +923,34 @@ IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
         <interface>
             <name>IPostProcService</name>
             <instance>camerapostprocservice</instance>
+        </interface>
+    </hal>
+    <!-- System Helper HAL Service -->
+    <hal format="hidl">
+        <name>vendor.qti.hardware.systemhelper</name>
+        <transport>hwbinder</transport>
+        <version>1.0</version>
+        <interface>
+            <name>ISystemEvent</name>
+            <instance>default</instance>
+        </interface>
+        <interface>
+            <name>ISystemResource</name>
+            <instance>default</instance>
+        </interface>
+    </hal>
+    <!-- Trusted UI HAL Service -->
+    <hal format="hidl">
+        <name>vendor.qti.hardware.trustedui</name>
+        <transport>hwbinder</transport>
+        <version>1.0</version>
+        <interface>
+            <name>ITrustedUI</name>
+            <instance>default</instance>
+        </interface>
+        <interface>
+            <name>ITrustedInput</name>
+            <instance>default</instance>
         </interface>
     </hal>
 </manifest>
