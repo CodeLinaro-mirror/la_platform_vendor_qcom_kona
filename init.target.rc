@@ -163,3 +163,8 @@ service vendor.cnss_diag /system/vendor/bin/cnss_diag -q -f -b 128 -t HELIUM
    group system wifi inet sdcard_rw media_rw diag
    oneshot
 
+service vendor.drm-widevine-hal-1-2 /vendor/bin/hw/android.hardware.drm@1.2-service.widevine
+   override
+   disabled
+   oneshot
+
