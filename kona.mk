@@ -481,6 +481,22 @@ PRODUCT_PROPERTY_OVERRIDES += \
     persist.vendor.radio.enableadvancedscan=true
 
 PRODUCT_PACKAGES += android.hardware.lights-service.qti
+# CEC Features
+PRODUCT_COPY_FILES += \
+    frameworks/native/data/etc/android.hardware.hdmi.cec.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.hdmi.cec.xml
+PRODUCT_PROPERTY_OVERRIDES += ro.hdmi.device_type=4
+
+# HDMI CEC service
+PRODUCT_PACKAGES += \
+    android.hardware.tv.cec@1.0-impl \
+    android.hardware.tv.cec@1.0-service
+
+DEVICE_FRAMEWORK_COMPATIBILITY_MATRIX_FILE += \
+    device/qcom/kona/vendor_framework_compatibility_matrix.xml
+
+PRODUCT_PROPERTY_OVERRIDES += \
+        persist.sys.hdmi.keep_awake=false
+
 ###################################################################################
 # This is the End of target.mk file.
 # Now, Pickup other split product.mk files:
