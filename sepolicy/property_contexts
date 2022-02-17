@@ -1,0 +1,2 @@
+# For LT9611_CEC
+vendor.sys.hdmicec.                     u:object_r:vendor_cec_prop:s0
