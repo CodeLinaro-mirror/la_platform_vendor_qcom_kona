@@ -354,7 +354,6 @@ PRODUCT_PACKAGES += \
     android.hardware.tv.cec@1.0-impl \
     android.hardware.tv.cec@1.0-service
 
-BOARD_SEPOLICY_DIRS += device/qcom/kona/sepolicy
 DEVICE_FRAMEWORK_COMPATIBILITY_MATRIX_FILE += \
     device/qcom/kona/vendor_framework_compatibility_matrix.xml
 
