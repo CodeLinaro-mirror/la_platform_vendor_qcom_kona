@@ -1,3 +1,0 @@
-# For LT9611 CEC
-/dev/cec[0-9]*                             u:object_r:cec_device:s0
-/sys/bus/i2c/devices/0-002b/get_hpd_stat   u:object_r:sysfs_hdmi:s0
