@@ -1,5 +1,10 @@
+TARGET_BOARD_PLATFORM := kona
+TARGET_BOOTLOADER_BOARD_NAME := kona
+
 BUILD_BROKEN_DUP_RULES := true
 
+ALLOW_MISSING_DEPENDENCIES := true
+RELAX_USES_LIBRARY_CHECK := true
 # Default Android A/B configuration
 ENABLE_AB ?= true
 
@@ -10,12 +15,27 @@ ifeq ($(ENABLE_VIRTUAL_AB), true)
     $(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota.mk)
 endif
 
+# true: earlycon and console enabled
+# false: console explicitly disabled
+# <empty>: default from kernel
+TARGET_CONSOLE_ENABLED ?=
+
+# Set GRF/Vendor freeze properties
+BOARD_SHIPPING_API_LEVEL := 33
+BOARD_API_LEVEL := 33
+
+# Set SoC manufacturer property
+PRODUCT_PROPERTY_OVERRIDES += \
+    ro.soc.manufacturer=QTI
+
 # For QSSI builds, we should skip building the system image. Instead we build the
 # "non-system" images (that we support).
 
 PRODUCT_BUILD_SYSTEM_IMAGE := false
 PRODUCT_BUILD_SYSTEM_OTHER_IMAGE := false
+PRODUCT_BUILD_SYSTEM_DLKM_IMAGE := true
 PRODUCT_BUILD_VENDOR_IMAGE := true
+PRODUCT_BUILD_VENDOR_DLKM_IMAGE := true
 PRODUCT_BUILD_PRODUCT_IMAGE := false
 PRODUCT_BUILD_SYSTEM_EXT_IMAGE := false
 PRODUCT_BUILD_ODM_IMAGE := false
@@ -25,6 +45,7 @@ else
 PRODUCT_BUILD_CACHE_IMAGE := true
 endif
 PRODUCT_BUILD_RAMDISK_IMAGE := true
+PRODUCT_BUILD_RECOVERY_IMAGE := true
 PRODUCT_BUILD_USERDATA_IMAGE := true
 
 # Also, since we're going to skip building the system image, we also skip
@@ -33,13 +54,6 @@ TARGET_SKIP_OTA_PACKAGE := true
 
 # Enable AVB 2.0
 BOARD_AVB_ENABLE := true
-
-SHIPPING_API_LEVEL := 30
-
-PRODUCT_SHIPPING_API_LEVEL := $(SHIPPING_API_LEVEL)
-
-BOARD_SHIPPING_API_LEVEL := 30
-BOARD_API_LEVEL := 30
 
 #####Dynamic partition Handling
 BOARD_DYNAMIC_PARTITION_ENABLE ?= true
@@ -58,14 +72,85 @@ BOARD_AVB_VBMETA_SYSTEM_KEY_PATH := external/avb/test/data/testkey_rsa2048.pem
 BOARD_AVB_VBMETA_SYSTEM_ALGORITHM := SHA256_RSA2048
 BOARD_AVB_VBMETA_SYSTEM_ROLLBACK_INDEX := $(PLATFORM_SECURITY_PATCH_TIMESTAMP)
 BOARD_AVB_VBMETA_SYSTEM_ROLLBACK_INDEX_LOCATION := 2
-$(call inherit-product, build/make/target/product/gsi_keys.mk)
+$(call inherit-product, build/make/target/product/developer_gsi_keys.mk)
 
 # Enable AVB 2.0
 BOARD_AVB_ENABLE := true
 
+###########
+#QMAA flags starts
+###########
+#QMAA global flag for modular architecture
+#true means QMAA is enabled for system
+#false means QMAA is disabled for system
+
+TARGET_USES_QMAA := true
+
+#QMAA flag which is set to incorporate any generic dependencies
+#required for the boot to UI flow in a QMAA enabled target.
+#Set to false when all target level depenencies are met with
+#actual full blown implementations.
+TARGET_USES_QMAA_RECOMMENDED_BOOT_CONFIG := false
+
+#QMAA tech team flag to override global QMAA per tech team
+#true means overriding global QMAA for this tech area
+#false means using global, no override
+TARGET_USES_QMAA_OVERRIDE_RPMB := true
+TARGET_USES_QMAA_OVERRIDE_GPT  := true
+TARGET_USES_QMAA_OVERRIDE_DISPLAY := true
+TARGET_USES_QMAA_OVERRIDE_AUDIO   := true
+TARGET_USES_QMAA_OVERRIDE_VIDEO   := true
+TARGET_USES_QMAA_OVERRIDE_CAMERA  := true
+TARGET_USES_QMAA_OVERRIDE_GFX     := true
+TARGET_USES_QMAA_OVERRIDE_WFD     := true
+TARGET_USES_QMAA_OVERRIDE_GPS     := false
+TARGET_USES_QMAA_OVERRIDE_ANDROID_RECOVERY := true
+TARGET_USES_QMAA_OVERRIDE_ANDROID_CORE := true
+TARGET_USES_QMAA_OVERRIDE_WLAN    := false
+TARGET_USES_QMAA_OVERRIDE_BLUETOOTH   := false
+TARGET_USES_QMAA_OVERRIDE_FM  := false
+TARGET_USES_QMAA_OVERRIDE_CVP  := true
+TARGET_USES_QMAA_OVERRIDE_FASTCV  := true
+TARGET_USES_QMAA_OVERRIDE_SCVE  := true
+TARGET_USES_QMAA_OVERRIDE_OPENVX  := true
+TARGET_USES_QMAA_OVERRIDE_DATA := true
+TARGET_USES_QMAA_OVERRIDE_DATA_NET := true
+TARGET_USES_QMAA_OVERRIDE_MSM_BUS_MODULE := true
+TARGET_USES_QMAA_OVERRIDE_KERNEL_TESTS_INTERNAL := false
+TARGET_USES_QMAA_OVERRIDE_MSMIRQBALANCE := true
+TARGET_USES_QMAA_OVERRIDE_DRM    := false
+TARGET_USES_QMAA_OVERRIDE_KMGK := true
+TARGET_USES_QMAA_OVERRIDE_VPP := true
+TARGET_USES_QMAA_OVERRIDE_GP := true
+TARGET_USES_QMAA_OVERRIDE_BIOMETRICS := true
+TARGET_USES_QMAA_OVERRIDE_PERF := false
+TARGET_USES_QMAA_OVERRIDE_SENSORS := true
+TARGET_USES_QMAA_OVERRIDE_SYNX := true
+TARGET_USES_QMAA_OVERRIDE_SECUREMSM_TESTS := false
+TARGET_USES_QMAA_OVERRIDE_SOTER := true
+TARGET_USES_QMAA_OVERRIDE_REMOTE_EFS := true
+TARGET_USES_QMAA_OVERRIDE_TFTP := true
+TARGET_USES_QMAA_OVERRIDE_EID := true
+
+#Full QMAA HAL List
+QMAA_HAL_LIST := audio video camera display sensors gps
+
+ifeq ($(TARGET_USES_QMAA), true)
+PRODUCT_PROPERTY_OVERRIDES += \
+    ro.vendor.confqmaa=true
+endif
+
+###########
+#QMAA flags ends
+###########
+
+#Suppot to compile recovery without msm headers
+TARGET_HAS_GENERIC_KERNEL_HEADERS := true
+
+NEED_AIDL_NDK_PLATFORM_BACKEND := true
+
 BOARD_HAVE_BLUETOOTH := false
 BOARD_HAVE_QCOM_FM := false
-TARGET_DISABLE_PERF_OPTIMIATIONS := false
 TARGET_DISABLE_DISPLAY := false
 
 # Enable incremental FS feature
@@ -81,7 +166,9 @@ PRODUCT_PROPERTY_OVERRIDES += \
 PRODUCT_PROPERTY_OVERRIDES += ro.control_privapp_permissions=enforce
 
 TARGET_DEFINES_DALVIK_HEAP := true
+$(call inherit-product, $(SRC_TARGET_DIR)/product/core_64_bit_only.mk)
 $(call inherit-product, device/qcom/vendor-common/common64.mk)
+$(call inherit-product, frameworks/native/build/phone-xhdpi-6144-dalvik-heap.mk)
 
 #Product property overrides to configure the Dalvik heap
 PRODUCT_PROPERTY_OVERRIDES  += \
@@ -102,7 +189,29 @@ PRODUCT_MODEL := Kona for arm64
 #----------------------------------------------------------------------
 # wlan specific
 #----------------------------------------------------------------------
+ifeq ($(TARGET_USES_QMAA), true)
+ifneq ($(TARGET_USES_QMAA_OVERRIDE_WLAN), true)
+include device/qcom/wlan/default/wlan.mk
+else
 include device/qcom/wlan/kona/wlan.mk
+endif
+else
+include device/qcom/wlan/kona/wlan.mk
+endif
+
+#----------------------------------------------------------------------
+# perf specific
+#----------------------------------------------------------------------
+ifeq ($(TARGET_USES_QMAA), true)
+    ifneq ($(TARGET_USES_QMAA_OVERRIDE_PERF), true)
+        TARGET_DISABLE_PERF_OPTIMIZATIONS := true
+    else
+        TARGET_DISABLE_PERF_OPTIMIZATIONS := false
+    endif
+else
+    TARGET_DISABLE_PERF_OPTIMIZATIONS := false
+endif
+# /* Disable perf opts */
 
 TARGET_USES_AOSP := false
 TARGET_USES_AOSP_FOR_AUDIO := false
@@ -119,24 +228,34 @@ PRODUCT_PROPERTY_OVERRIDES += \
     vendor.qcom.bluetooth.soc=hastings \
 	ro.sf.lcd_density=560
 
-###########
-#QMAA flags starts
-###########
-#QMAA global flag for modular architecture
-#true means QMAA is enabled for system
-#false means QMAA is disabled for system
-
-TARGET_USES_QMAA := false
-
-###########
-#QMAA flags ends
-###########
 
 TARGET_ENABLE_QC_AV_ENHANCEMENTS := true
 
+SHIPPING_API_LEVEL := 33
+PRODUCT_SHIPPING_API_LEVEL := 33
+
 ###########
-# Kernel configurations
-TARGET_KERNEL_VERSION := 4.19
+# Set kernel version and ion flags
+TARGET_KERNEL_VERSION := 5.15
+TARGET_USES_NEW_ION := true
+
+# Disable DLKM generation until build support is available
+TARGET_KERNEL_DLKM_DISABLE := true
+
+# Tech specific flags
+TARGET_KERNEL_DLKM_AUDIO_OVERRIDE := false
+TARGET_KERNEL_DLKM_BT_OVERRIDE := false
+TARGET_KERNEL_DLKM_CAMERA_OVERRIDE := false
+TARGET_KERNEL_DLKM_NFC_OVERRIDE := false
+TARGET_KERNEL_DLKM_DATA_OVERRIDE := false
+TARGET_KERNEL_DLKM_DISPLAY_OVERRIDE := false
+TARGET_KERNEL_DLKM_SECURE_MSM_OVERRIDE := true
+TARGET_KERNEL_DLKM_THERMAL_OVERRIDE := false
+TARGET_KERNEL_DLKM_TOUCH_OVERRIDE := false
+TARGET_KERNEL_DLKM_VIDEO_OVERRIDE := false
+TARGET_KERNEL_DLKM_WLAN_OVERRIDE := false
+TARGET_KERNEL_DLKM_MMRM_OVERRIDE := false
+
 #Enable llvm support for kernel
 KERNEL_LLVM_SUPPORT := true
 #Enable sd-llvm support for kernel
@@ -232,34 +351,34 @@ DEVICE_MANIFEST_FILE := device/qcom/kona/manifest.xml
 DEVICE_MATRIX_FILE   := device/qcom/common/compatibility_matrix.xml
 
 #Audio DLKM
-AUDIO_DLKM := audio_apr.ko
-AUDIO_DLKM += audio_q6_pdr.ko
-AUDIO_DLKM += audio_q6_notifier.ko
-AUDIO_DLKM += audio_adsp_loader.ko
-AUDIO_DLKM += audio_q6.ko
-AUDIO_DLKM += audio_usf.ko
-AUDIO_DLKM += audio_pinctrl_wcd.ko
-AUDIO_DLKM += audio_swr.ko
-AUDIO_DLKM += audio_wcd_core.ko
-AUDIO_DLKM += audio_swr_ctrl.ko
-AUDIO_DLKM += audio_wsa881x.ko
-AUDIO_DLKM += audio_platform.ko
-AUDIO_DLKM += audio_hdmi.ko
-AUDIO_DLKM += audio_stub.ko
-AUDIO_DLKM += audio_wcd9xxx.ko
-AUDIO_DLKM += audio_mbhc.ko
-AUDIO_DLKM += audio_native.ko
-AUDIO_DLKM += audio_wcd938x.ko
-AUDIO_DLKM += audio_wcd938x_slave.ko
-AUDIO_DLKM += audio_bolero_cdc.ko
-AUDIO_DLKM += audio_wsa_macro.ko
-AUDIO_DLKM += audio_va_macro.ko
-AUDIO_DLKM += audio_rx_macro.ko
-AUDIO_DLKM += audio_tx_macro.ko
-AUDIO_DLKM += audio_machine_kona.ko
-AUDIO_DLKM += audio_snd_event.ko
-
-PRODUCT_PACKAGES += $(AUDIO_DLKM)
+#AUDIO_DLKM := audio_apr.ko
+#AUDIO_DLKM += audio_q6_pdr.ko
+#AUDIO_DLKM += audio_q6_notifier.ko
+#AUDIO_DLKM += audio_adsp_loader.ko
+#AUDIO_DLKM += audio_q6.ko
+#AUDIO_DLKM += audio_usf.ko
+#AUDIO_DLKM += audio_pinctrl_wcd.ko
+#AUDIO_DLKM += audio_swr.ko
+#AUDIO_DLKM += audio_wcd_core.ko
+#AUDIO_DLKM += audio_swr_ctrl.ko
+#AUDIO_DLKM += audio_wsa881x.ko
+#AUDIO_DLKM += audio_platform.ko
+#AUDIO_DLKM += audio_hdmi.ko
+#AUDIO_DLKM += audio_stub.ko
+#AUDIO_DLKM += audio_wcd9xxx.ko
+#AUDIO_DLKM += audio_mbhc.ko
+#AUDIO_DLKM += audio_native.ko
+#AUDIO_DLKM += audio_wcd938x.ko
+#AUDIO_DLKM += audio_wcd938x_slave.ko
+#AUDIO_DLKM += audio_bolero_cdc.ko
+#AUDIO_DLKM += audio_wsa_macro.ko
+#AUDIO_DLKM += audio_va_macro.ko
+#AUDIO_DLKM += audio_rx_macro.ko
+#AUDIO_DLKM += audio_tx_macro.ko
+#AUDIO_DLKM += audio_machine_kona.ko
+#AUDIO_DLKM += audio_snd_event.ko
+#
+#PRODUCT_PACKAGES += $(AUDIO_DLKM)
 
 # Kernel modules install path
 KERNEL_MODULES_INSTALL := dlkm
@@ -282,19 +401,39 @@ PRODUCT_COPY_FILES += \
 PRODUCT_FULL_TREBLE_OVERRIDE := true
 PRODUCT_VENDOR_MOVE_ENABLED := true
 PRODUCT_COMPATIBLE_PROPERTY_OVERRIDE := true
+BOARD_SYSTEMSDK_VERSIONS := 33
 
 ifeq (true,$(BUILDING_WITH_VSDK))
-  ALLOW_MISSING_DEPENDENCIES := true
-  TARGET_SKIP_CURRENT_VNDK := true
-  BOARD_VNDK_VERSION := 30
-  RECOVERY_SNAPSHOT_VERSION := 30
-  RAMDISK_SNAPSHOT_VERSION := 30
+    ALLOW_MISSING_DEPENDENCIES := true
+    TARGET_SKIP_CURRENT_VNDK := true
+
+    ifneq (,$(filter vendor,$(DISABLED_VSDK_SNAPSHOTS_LIST)))
+        # Vendor snapshot is disabled with VSDK
+        BOARD_VNDK_VERSION := current
+    else
+        BOARD_VNDK_VERSION := 33
+    endif
+
+    ifneq (,$(filter recovery,$(DISABLED_VSDK_SNAPSHOTS_LIST)))
+        # Recovery snapshot is disabled with VSDK
+        RECOVERY_SNAPSHOT_VERSION := current
+    else
+        RECOVERY_SNAPSHOT_VERSION := 33
+    endif
+
+    ifneq (,$(filter ramdisk,$(DISABLED_VSDK_SNAPSHOTS_LIST)))
+        # Ramdisk snapshot is disabled with VSDK
+        RAMDISK_SNAPSHOT_VERSION := current
+    else
+        RAMDISK_SNAPSHOT_VERSION := 33
+    endif
 else
-  BOARD_VNDK_VERSION := current
-  RECOVERY_SNAPSHOT_VERSION := current
-  RAMDISK_SNAPSHOT_VERSION := current
+    BOARD_VNDK_VERSION := current
+    RECOVERY_SNAPSHOT_VERSION := current
+    RAMDISK_SNAPSHOT_VERSION := current
 endif
-TARGET_MOUNT_POINTS_SYMLINKS := false
+
+$(warning "BOARD_VNDK_VERSION = $(BOARD_VNDK_VERSION), RECOVERY_SNAPSHOT_VERSION=$(RECOVERY_SNAPSHOT_VERSION), RAMDISK_SNAPSHOT_VERSION=$(RAMDISK_SNAPSHOT_VERSION)")
 
 # Fingerprint feature
 PRODUCT_COPY_FILES += \

@@ -15,21 +15,53 @@ TARGET_HOST_LD_OVERRIDE := $(TARGET_HOST_COMPILER_PREFIX_OVERRIDE)ld
 # Compile (L)ittle (K)ernel bootloader and the nandwrite utility
 #----------------------------------------------------------------------
 ifneq ($(strip $(TARGET_NO_BOOTLOADER)),true)
+ifneq ($(strip $(TARGET_SIGNONLY_BOOTLOADER)),true)
 
 # Compile
 include bootable/bootloader/edk2/AndroidBoot.mk
 
 $(INSTALLED_BOOTLOADER_MODULE): $(TARGET_EMMC_BOOTLOADER) | $(ACP)
-	$(transform-prebuilt-to-target)
+else
+TARGET_EMMC_BOOTLOADER := $(TARGET_BOARD_UNSIGNED_ABL_DIR)/unsigned_abl.elf
+SIGN_ABL := $(PRODUCT_OUT)/abl.elf
+XML_FILE := secimagev3.xml
+
+ifeq ($(TARGET_USES_UEFI), true)
+SIGN_ID := abl
+else
+SIGN_ID := appsbl
+endif
+
+define sec-image-generate
+	@echo Generating signed appsbl using secimage tool for $(strip $(QTI_GENSECIMAGE_MSM_IDS))
+	@rm -rf $(PRODUCT_OUT)/abl.elf
+
+	$(hide) SECIMAGE_LOCAL_DIR=$(SECIMAGE_BASE) USES_SEC_POLICY_MULTIPLE_DEFAULT_SIGN=$(USES_SEC_POLICY_MULTIPLE_DEFAULT_SIGN) \
+		USES_SEC_POLICY_DEFAULT_SUBFOLDER_SIGN=$(USES_SEC_POLICY_DEFAULT_SUBFOLDER_SIGN) \
+		USES_SEC_POLICY_INTEGRITY_CHECK=$(USES_SEC_POLICY_INTEGRITY_CHECK) python $(SECIMAGE_BASE)/sectools_builder.py \
+		-i $(TARGET_EMMC_BOOTLOADER) \
+		-t $(PRODUCT_OUT)/ \
+		-g $(SIGN_ID) \
+		--soc_hw_version $(SOC_HW_VERSION) \
+		--soc_vers $(SOC_VERS) \
+		--config=$(SECIMAGE_BASE)/config/integration/$(XML_FILE) \
+		--install_base_dir=$(PRODUCT_OUT) \
+		--install_file_name=abl.elf
+		> $(PRODUCT_OUT)/secimage.log 2>&1
+	@echo Completed secimage signed appsbl \(logs in $(PRODUCT_OUT)/secimage.log\)
+endef
+
+$(SIGN_ABL): $(TARGET_EMMC_BOOTLOADER)
+	$(call sec-image-generate)
+$(INSTALLED_BOOTLOADER_MODULE): $(SIGN_ABL) | $(ACP)
+endif
+
+#   $(transform-prebuilt-to-target)
 $(BUILT_TARGET_FILES_PACKAGE): $(INSTALLED_BOOTLOADER_MODULE)
 
 droidcore: $(INSTALLED_BOOTLOADER_MODULE)
+droidcore-unbundled: $(INSTALLED_BOOTLOADER_MODULE)
 endif
-
-#----------------------------------------------------------------------
-# Compile Linux Kernel
-#----------------------------------------------------------------------
-include device/qcom/kernelscripts/kernel_definitions.mk
 
 #----------------------------------------------------------------------
 # Copy additional target-specific files
