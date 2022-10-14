@@ -108,6 +108,9 @@ TARGET_USES_AOSP := false
 TARGET_USES_AOSP_FOR_AUDIO := false
 TARGET_USES_QCOM_BSP := false
 
+# diag-router
+TARGET_HAS_DIAG_ROUTER := true
+
 # RRO configuration
 TARGET_USES_RRO := true
 
