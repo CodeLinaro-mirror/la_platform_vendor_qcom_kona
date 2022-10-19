@@ -32,6 +32,8 @@ else
 SIGN_ID := appsbl
 endif
 
+SECIMAGE_BASE := vendor/qcom/proprietary/sectools
+
 define sec-image-generate
 	@echo Generating signed appsbl using secimage tool for $(strip $(QTI_GENSECIMAGE_MSM_IDS))
 	@rm -rf $(PRODUCT_OUT)/abl.elf
