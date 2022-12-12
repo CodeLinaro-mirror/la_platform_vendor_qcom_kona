@@ -30,6 +30,8 @@ TARGET_USES_UEFI := true
 TARGET_NO_KERNEL := false
 TARGET_SIGNONLY_BOOTLOADER := true
 
+BOARD_RAMDISK_USE_LZ4 := true
+
 -include $(QCPATH)/common/kona/BoardConfigVendor.mk
 
 USE_OPENGL_RENDERER := true
@@ -119,7 +121,7 @@ BOARD_BOOTIMAGE_PARTITION_SIZE := 0x06000000
 BOARD_KERNEL-GKI_BOOTIMAGE_PARTITION_SIZE := $(BOARD_BOOTIMAGE_PARTITION_SIZE)
 BOARD_INIT_BOOT_IMAGE_PARTITION_SIZE := 0x00800000
 BOARD_VENDOR_BOOTIMAGE_PARTITION_SIZE := 0x06000000
-BOARD_USERDATAIMAGE_PARTITION_SIZE := 48318382080
+BOARD_USERDATAIMAGE_PARTITION_SIZE := 10737418240
 BOARD_PERSISTIMAGE_PARTITION_SIZE := 33554432
 BOARD_PERSISTIMAGE_FILE_SYSTEM_TYPE := ext4
 BOARD_DTBOIMG_PARTITION_SIZE := 0x0800000
@@ -138,7 +140,7 @@ BOARD_BOOTCONFIG := androidboot.hardware=qcom androidboot.memcg=1 androidboot.us
 # false -- override kernel configuration to disable console
 # <blank> (default) -- use kernel default configuration
 ifeq ($(TARGET_CONSOLE_ENABLED),true)
-BOARD_KERNEL_CMDLINE += console=ttyMSM0,115200n8 earlycon qcom_geni_serial.con_enabled=1
+BOARD_KERNEL_CMDLINE += console=ttyMSM0,115200n8 earlycon=qcom_geni,0xa90000 qcom_geni_serial.con_enabled=1
 BOARD_BOOTCONFIG += androidboot.console=ttyMSM0
 else
 ifeq ($(TARGET_CONSOLE_ENABLED),false)
