@@ -12,7 +12,9 @@ ENABLE_AB ?= true
 ENABLE_VIRTUAL_AB ?= true
 
 ifeq ($(ENABLE_VIRTUAL_AB), true)
-    $(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota.mk)
+    $(call inherit-product, $(SRC_TARGET_DIR)/product/generic_ramdisk.mk)
+    $(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota/android_t_baseline.mk)
+    PRODUCT_VIRTUAL_AB_COMPRESSION_METHOD := gz
 endif
 
 # true: earlycon and console enabled
