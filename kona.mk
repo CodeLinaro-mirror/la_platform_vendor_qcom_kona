@@ -152,6 +152,9 @@ endif
 #QMAA flags ends
 ###########
 
+#Enable Qseecom
+TARGET_ENABLE_QSEECOM := true
+
 #Suppot to compile recovery without msm headers
 TARGET_HAS_GENERIC_KERNEL_HEADERS := true
 
