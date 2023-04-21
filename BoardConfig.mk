@@ -62,7 +62,11 @@ TARGET_COPY_OUT_ODM := odm
 BOARD_ODMIMAGE_FILE_SYSTEM_TYPE := ext4
 
 ifeq ($(ENABLE_AB), true)
-AB_OTA_PARTITIONS ?= boot vendor vendor_dlkm system_dlkm odm dtbo vbmeta
+    ifeq ($(BOARD_AVB_ENABLE),true)
+        AB_OTA_PARTITIONS ?= boot init_boot vendor_boot recovery vendor vendor_dlkm system_dlkm odm dtbo vbmeta
+    else
+        AB_OTA_PARTITIONS ?= boot init_boot vendor_boot recovery vendor vendor_dlkm system_dlkm odm dtbo
+    endif
 endif
 BOARD_EXT4_SHARE_DUP_BLOCKS := true
 

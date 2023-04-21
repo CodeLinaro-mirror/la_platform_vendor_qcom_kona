@@ -12,7 +12,9 @@ ENABLE_AB ?= true
 ENABLE_VIRTUAL_AB ?= true
 
 ifeq ($(ENABLE_VIRTUAL_AB), true)
-    $(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota.mk)
+    $(call inherit-product, $(SRC_TARGET_DIR)/product/generic_ramdisk.mk)
+    $(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota/android_t_baseline.mk)
+    PRODUCT_VIRTUAL_AB_COMPRESSION_METHOD := gz
 endif
 
 # true: earlycon and console enabled
@@ -101,42 +103,42 @@ TARGET_USES_QMAA_RECOMMENDED_BOOT_CONFIG := false
 #QMAA tech team flag to override global QMAA per tech team
 #true means overriding global QMAA for this tech area
 #false means using global, no override
-TARGET_USES_QMAA_OVERRIDE_RPMB := false
-TARGET_USES_QMAA_OVERRIDE_GPT  := false
+TARGET_USES_QMAA_OVERRIDE_RPMB := true
+TARGET_USES_QMAA_OVERRIDE_GPT  := true
 TARGET_USES_QMAA_OVERRIDE_DISPLAY := true
 TARGET_USES_QMAA_OVERRIDE_AUDIO   := true
-TARGET_USES_QMAA_OVERRIDE_VIDEO   := false
+TARGET_USES_QMAA_OVERRIDE_VIDEO   := true
 TARGET_USES_QMAA_OVERRIDE_CAMERA  := true
 TARGET_USES_QMAA_OVERRIDE_GFX     := true
-TARGET_USES_QMAA_OVERRIDE_WFD     := false
+TARGET_USES_QMAA_OVERRIDE_WFD     := true
 TARGET_USES_QMAA_OVERRIDE_GPS     := false
 TARGET_USES_QMAA_OVERRIDE_ANDROID_RECOVERY := true
 TARGET_USES_QMAA_OVERRIDE_ANDROID_CORE := true
 TARGET_USES_QMAA_OVERRIDE_WLAN    := true
-TARGET_USES_QMAA_OVERRIDE_BLUETOOTH   := false
+TARGET_USES_QMAA_OVERRIDE_BLUETOOTH   := true
 TARGET_USES_QMAA_OVERRIDE_FM  := false
 TARGET_USES_QMAA_OVERRIDE_CVP  := true
 TARGET_USES_QMAA_OVERRIDE_FASTCV  := true
 TARGET_USES_QMAA_OVERRIDE_FASTRPC := true
-TARGET_USES_QMAA_OVERRIDE_SCVE  := false
-TARGET_USES_QMAA_OVERRIDE_OPENVX  := false
+TARGET_USES_QMAA_OVERRIDE_SCVE  := true
+TARGET_USES_QMAA_OVERRIDE_OPENVX  := true
 TARGET_USES_QMAA_OVERRIDE_DATA := false
 TARGET_USES_QMAA_OVERRIDE_DATA_NET := false
-TARGET_USES_QMAA_OVERRIDE_MSM_BUS_MODULE := false
-TARGET_USES_QMAA_OVERRIDE_KERNEL_TESTS_INTERNAL := false
-TARGET_USES_QMAA_OVERRIDE_MSMIRQBALANCE := false
+TARGET_USES_QMAA_OVERRIDE_MSM_BUS_MODULE := true
+TARGET_USES_QMAA_OVERRIDE_KERNEL_TESTS_INTERNAL := true
+TARGET_USES_QMAA_OVERRIDE_MSMIRQBALANCE := true
 TARGET_USES_QMAA_OVERRIDE_DRM    := false
 TARGET_USES_QMAA_OVERRIDE_KMGK := false
 TARGET_USES_QMAA_OVERRIDE_VPP := false
 TARGET_USES_QMAA_OVERRIDE_GP := false
-TARGET_USES_QMAA_OVERRIDE_BIOMETRICS := false
-TARGET_USES_QMAA_OVERRIDE_PERF := false
+TARGET_USES_QMAA_OVERRIDE_BIOMETRICS := true
+TARGET_USES_QMAA_OVERRIDE_PERF := true
 TARGET_USES_QMAA_OVERRIDE_SENSORS := false
 TARGET_USES_QMAA_OVERRIDE_SYNX := true
 TARGET_USES_QMAA_OVERRIDE_SECUREMSM_TESTS := false
 TARGET_USES_QMAA_OVERRIDE_SOTER := false
-TARGET_USES_QMAA_OVERRIDE_REMOTE_EFS := false
-TARGET_USES_QMAA_OVERRIDE_TFTP := false
+TARGET_USES_QMAA_OVERRIDE_REMOTE_EFS := true
+TARGET_USES_QMAA_OVERRIDE_TFTP := true
 TARGET_USES_QMAA_OVERRIDE_EID := false
 TARGET_USES_QMAA_OVERRIDE_USB := true
 
@@ -152,10 +154,13 @@ endif
 #QMAA flags ends
 ###########
 
+#Enable Qseecom
+TARGET_ENABLE_QSEECOM := true
+
 #Suppot to compile recovery without msm headers
 TARGET_HAS_GENERIC_KERNEL_HEADERS := true
 
-BOARD_HAVE_BLUETOOTH := false
+BOARD_HAVE_BLUETOOTH := true
 BOARD_HAVE_QCOM_FM := false
 TARGET_DISABLE_DISPLAY := false
 
@@ -260,7 +265,7 @@ TARGET_KERNEL_DLKM_CAMERA_OVERRIDE := false
 TARGET_KERNEL_DLKM_VIDEO_OVERRIDE := false
 TARGET_KERNEL_DLKM_DISPLAY_OVERRIDE := false
 endif
-TARGET_KERNEL_DLKM_BT_OVERRIDE := false
+TARGET_KERNEL_DLKM_BT_OVERRIDE := true
 TARGET_KERNEL_DLKM_NFC_OVERRIDE := false
 TARGET_KERNEL_DLKM_DATA_OVERRIDE := false
 TARGET_KERNEL_DLKM_SECURE_MSM_OVERRIDE := true
@@ -471,13 +476,27 @@ PRODUCT_BOOT_JARS += tcmiface
 PRODUCT_BOOT_JARS += telephony-ext
 PRODUCT_PACKAGES += telephony-ext
 
-PRODUCT_PACKAGES += init.qti.dcvs.sh
-
 # Vendor property to enable advanced network scanning
 PRODUCT_PROPERTY_OVERRIDES += \
     persist.vendor.radio.enableadvancedscan=true
 
 PRODUCT_PACKAGES += android.hardware.lights-service.qti
+# CEC Features
+PRODUCT_COPY_FILES += \
+    frameworks/native/data/etc/android.hardware.hdmi.cec.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.hdmi.cec.xml
+PRODUCT_PROPERTY_OVERRIDES += ro.hdmi.device_type=4
+
+# HDMI CEC service
+PRODUCT_PACKAGES += \
+    android.hardware.tv.cec@1.0-impl \
+    android.hardware.tv.cec@1.0-service
+
+DEVICE_FRAMEWORK_COMPATIBILITY_MATRIX_FILE += \
+    device/qcom/kona/vendor_framework_compatibility_matrix.xml
+
+PRODUCT_PROPERTY_OVERRIDES += \
+        persist.sys.hdmi.keep_awake=false
+
 ###################################################################################
 # This is the End of target.mk file.
 # Now, Pickup other split product.mk files:
