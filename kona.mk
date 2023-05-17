@@ -203,19 +203,6 @@ PRODUCT_BRAND := qti
 PRODUCT_MODEL := Kona for arm64
 
 #----------------------------------------------------------------------
-# wlan specific
-#----------------------------------------------------------------------
-ifeq ($(TARGET_USES_QMAA), true)
-ifneq ($(TARGET_USES_QMAA_OVERRIDE_WLAN), true)
-include device/qcom/wlan/default/wlan.mk
-else
-include device/qcom/wlan/kona/wlan.mk
-endif
-else
-include device/qcom/wlan/kona/wlan.mk
-endif
-
-#----------------------------------------------------------------------
 # perf specific
 #----------------------------------------------------------------------
 ifeq ($(TARGET_USES_QMAA), true)
@@ -257,6 +244,19 @@ TARGET_USES_NEW_ION := true
 
 # Disable DLKM generation until build support is available
 TARGET_KERNEL_DLKM_DISABLE := true
+
+#----------------------------------------------------------------------
+# wlan specific
+#----------------------------------------------------------------------
+ifeq ($(TARGET_USES_QMAA), true)
+ifneq ($(TARGET_USES_QMAA_OVERRIDE_WLAN), true)
+include device/qcom/wlan/default/wlan.mk
+else
+include device/qcom/wlan/kona/wlan.mk
+endif
+else
+include device/qcom/wlan/kona/wlan.mk
+endif
 
 # Tech specific flags
 ifeq ($(TARGET_KERNEL_VERSION),5.15)
