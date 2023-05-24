@@ -20,7 +20,7 @@ endif
 # true: earlycon and console enabled
 # false: console explicitly disabled
 # <empty>: default from kernel
-TARGET_CONSOLE_ENABLED = true
+TARGET_CONSOLE_ENABLED ?=
 
 # Set GRF/Vendor freeze properties
 BOARD_SHIPPING_API_LEVEL := 33
