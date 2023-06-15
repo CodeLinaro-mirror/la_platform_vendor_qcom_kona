@@ -92,7 +92,7 @@ SYSTEMEXT_SEPARATE_PARTITION_ENABLE := true
 #true means QMAA is enabled for system
 #false means QMAA is disabled for system
 
-TARGET_USES_QMAA := true
+TARGET_USES_QMAA := false
 
 #QMAA flag which is set to incorporate any generic dependencies
 #required for the boot to UI flow in a QMAA enabled target.
@@ -111,7 +111,7 @@ TARGET_USES_QMAA_OVERRIDE_VIDEO   := true
 TARGET_USES_QMAA_OVERRIDE_CAMERA  := true
 TARGET_USES_QMAA_OVERRIDE_GFX     := true
 TARGET_USES_QMAA_OVERRIDE_WFD     := true
-TARGET_USES_QMAA_OVERRIDE_GPS     := false
+TARGET_USES_QMAA_OVERRIDE_GPS     := true
 TARGET_USES_QMAA_OVERRIDE_ANDROID_RECOVERY := true
 TARGET_USES_QMAA_OVERRIDE_ANDROID_CORE := true
 TARGET_USES_QMAA_OVERRIDE_WLAN    := true
@@ -122,26 +122,24 @@ TARGET_USES_QMAA_OVERRIDE_FASTCV  := true
 TARGET_USES_QMAA_OVERRIDE_FASTRPC := true
 TARGET_USES_QMAA_OVERRIDE_SCVE  := true
 TARGET_USES_QMAA_OVERRIDE_OPENVX  := true
-TARGET_USES_QMAA_OVERRIDE_DATA := false
-TARGET_USES_QMAA_OVERRIDE_DATA_NET := false
 TARGET_USES_QMAA_OVERRIDE_MSM_BUS_MODULE := true
 TARGET_USES_QMAA_OVERRIDE_KERNEL_TESTS_INTERNAL := true
 TARGET_USES_QMAA_OVERRIDE_MSMIRQBALANCE := true
-TARGET_USES_QMAA_OVERRIDE_DRM    := false
+TARGET_USES_QMAA_OVERRIDE_DRM    := true
 TARGET_USES_QMAA_OVERRIDE_KMGK := true
-TARGET_USES_QMAA_OVERRIDE_VPP := false
-TARGET_USES_QMAA_OVERRIDE_GP := false
+TARGET_USES_QMAA_OVERRIDE_VPP := true
+TARGET_USES_QMAA_OVERRIDE_GP := true
 TARGET_USES_QMAA_OVERRIDE_BIOMETRICS := true
 TARGET_USES_QMAA_OVERRIDE_PERF := true
-TARGET_USES_QMAA_OVERRIDE_SENSORS := false
+TARGET_USES_QMAA_OVERRIDE_SENSORS := true
 TARGET_USES_QMAA_OVERRIDE_SYNX := true
-TARGET_USES_QMAA_OVERRIDE_SECUREMSM_TESTS := false
+TARGET_USES_QMAA_OVERRIDE_SECUREMSM_TESTS := true
 TARGET_USES_QMAA_OVERRIDE_SMCINVOKE := true
-TARGET_USES_QMAA_OVERRIDE_SOTER := false
+TARGET_USES_QMAA_OVERRIDE_SOTER := true
 TARGET_USES_QMAA_OVERRIDE_REMOTE_EFS := true
 TARGET_USES_QMAA_OVERRIDE_TFTP := true
-TARGET_USES_QMAA_OVERRIDE_EID := false
 TARGET_USES_QMAA_OVERRIDE_USB := true
+TARGET_USES_QMAA_OVERRIDE_CRYPTFSHW := true
 
 #Full QMAA HAL List
 QMAA_HAL_LIST := audio video camera display sensors gps
@@ -202,19 +200,6 @@ PRODUCT_BRAND := qti
 PRODUCT_MODEL := Kona for arm64
 
 #----------------------------------------------------------------------
-# wlan specific
-#----------------------------------------------------------------------
-ifeq ($(TARGET_USES_QMAA), true)
-ifneq ($(TARGET_USES_QMAA_OVERRIDE_WLAN), true)
-include device/qcom/wlan/default/wlan.mk
-else
-include device/qcom/wlan/kona/wlan.mk
-endif
-else
-include device/qcom/wlan/kona/wlan.mk
-endif
-
-#----------------------------------------------------------------------
 # perf specific
 #----------------------------------------------------------------------
 ifeq ($(TARGET_USES_QMAA), true)
@@ -256,6 +241,19 @@ TARGET_USES_NEW_ION := true
 
 # Disable DLKM generation until build support is available
 TARGET_KERNEL_DLKM_DISABLE := true
+
+#----------------------------------------------------------------------
+# wlan specific
+#----------------------------------------------------------------------
+ifeq ($(TARGET_USES_QMAA), true)
+ifneq ($(TARGET_USES_QMAA_OVERRIDE_WLAN), true)
+include device/qcom/wlan/default/wlan.mk
+else
+include device/qcom/wlan/kona/wlan.mk
+endif
+else
+include device/qcom/wlan/kona/wlan.mk
+endif
 
 # Tech specific flags
 ifeq ($(TARGET_KERNEL_VERSION),5.15)
