@@ -156,9 +156,6 @@ endif
 #Enable Qseecom
 TARGET_ENABLE_QSEECOM := true
 
-#Enable KM4.0
-TARGET_ENABLE_KEYMASTER_4_0 := true
-
 #Suppot to compile recovery without msm headers
 TARGET_HAS_GENERIC_KERNEL_HEADERS := true
 
